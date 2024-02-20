@@ -1,0 +1,1 @@
+/Users/mikhailov/Projects/tglog/buildSrc/build/classes/kotlin/main/Kotlin.class:/Users/mikhailov/Projects/tglog/buildSrc/build/classes/kotlin/main/Repository.class:/Users/mikhailov/Projects/tglog/buildSrc/build/classes/kotlin/main/Versions.class
