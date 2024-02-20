@@ -10,6 +10,8 @@ import com.github.dockerjava.api.model.Frame
 import com.github.dockerjava.core.DefaultDockerClientConfig
 import com.github.dockerjava.core.DockerClientImpl
 import com.github.dockerjava.zerodep.ZerodepDockerHttpClient
+import me.underlow.tglog.messages.ContainerMessage
+import me.underlow.tglog.messages.LogMessage
 import me.underlow.tglog.messages.MessageReceiver
 import org.springframework.stereotype.Service
 
@@ -58,7 +60,7 @@ class DockerService(val messageReceiver: MessageReceiver) {
         val callback = object : Adapter<Frame>() {
             override fun onNext(frame: Frame) {
                 println("${container.readableName()}:  ${frame.payload.decodeToString()}")
-                messageReceiver.receiveMessage(container.readableName(), frame.payload.decodeToString())
+                messageReceiver.receiveMessage(LogMessage(container.readableName(), frame.payload.decodeToString()))
             }
         }
 
@@ -87,7 +89,7 @@ class DockerService(val messageReceiver: MessageReceiver) {
             return
         }
 
-        messageReceiver.receiveMessage(container.readableName(), event.action ?: "unknown action")
+        messageReceiver.receiveMessage(ContainerMessage(container.readableName(), event.action ?: "unknown action"))
         println("New container created: ${container.readableName()}")
 
         if (event.action == "start") {
