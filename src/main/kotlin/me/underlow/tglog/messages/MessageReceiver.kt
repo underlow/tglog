@@ -22,7 +22,9 @@ class MessageReceiver {
 
 private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
-sealed interface Message
+sealed interface Message{
+    val containerName: String
+}
 
-data class LogMessage(val containerName: String, val message: String) : Message
-data class ContainerMessage(val containerName: String, val message: String) : Message
+data class LogMessage(override val containerName: String, val message: String) : Message
+data class ContainerMessage(override val containerName: String, val message: String) : Message

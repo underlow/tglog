@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service
     ContainerEventsConfiguration::class,
     ContainerNamesConfiguration::class
 )
-class MessageProcessor(
+class MessageFilter(
     private val messageReceiver: MessageReceiver,
     private val logEventConfiguration: LogEventConfiguration,
     private val containerEventsConfiguration: ContainerEventsConfiguration,
@@ -37,59 +37,70 @@ class MessageProcessor(
     }
 
     private fun processContainerMessage(message: ContainerMessage) {
-        if (message.containerName in containerNamesConfiguration.exclude) {
-            logger.debug { "Container ${message.containerName} is excluded from processing" }
+        if (filterByContainerName(message))
             return
-        }
 
-        if (containerEventsConfiguration.include.isNotEmpty() &&
-            message.message !in containerEventsConfiguration.include
-        ) {
-            logger.debug { "Container ${message.containerName} is not included in processing" }
+        if (filterByContainerEvent(message))
             return
-        }
-
-        if (message.message in containerEventsConfiguration.exclude) {
-            logger.debug { "Message ${message.message} is excluded from processing" }
-            return
-        }
-        if (containerEventsConfiguration.include.isNotEmpty() &&
-            message.message !in containerEventsConfiguration.include
-        ) {
-            logger.debug { "Message ${message.message} is not included in processing" }
-            return
-        }
 
         tgBot.sendMessage(message.containerName, message.message) // todo: change to more friendly messages
     }
 
     private fun processLogMessage(message: LogMessage) {
-        if (message.containerName in containerNamesConfiguration.exclude) {
-            logger.debug { "Container ${message.containerName} is excluded from processing" }
+        if (filterByContainerName(message))
             return
-        }
 
+        if (filterBySubstring(message))
+            return
+
+        tgBot.sendMessage(message.containerName, message.message) // todo: change to more friendly messages
+    }
+
+    private fun filterByContainerEvent(message: ContainerMessage): Boolean {
+        if (message.message in containerEventsConfiguration.exclude) {
+            logger.debug { "Message ${message.message} is excluded from processing" }
+            return true
+        }
         if (containerEventsConfiguration.include.isNotEmpty() &&
             message.message !in containerEventsConfiguration.include
         ) {
-            logger.debug { "Container ${message.containerName} is not included in processing" }
-            return
+            logger.debug { "Message ${message.message} is not included in processing" }
+            return true
+        }
+        return false
+    }
+
+    private fun filterByContainerName(message: Message): Boolean {
+        if (message.containerName in containerNamesConfiguration.exclude) {
+            logger.debug { "Container ${message.containerName} is excluded from processing" }
+            return true
         }
 
+        if (containerNamesConfiguration.include.isNotEmpty() &&
+            message.containerName !in containerEventsConfiguration.include
+        ) {
+            logger.debug { "Container ${message.containerName} is not included in processing" }
+            return true
+        }
+        return false
+    }
+
+
+
+    private fun filterBySubstring(message: LogMessage): Boolean {
         if (logEventConfiguration.exclude.isNotEmpty() &&
             logEventConfiguration.exclude.split(",").all { it !in message.message }
         ) {
             logger.trace { "Message ${message.message} is excluded from processing" }
-            return
+            return true
         }
         if (containerEventsConfiguration.include.isNotEmpty() &&
             logEventConfiguration.include.split(",").any { it in message.message }
         ) {
             logger.trace { "Message ${message.message} is not included in processing" }
-            return
+            return true
         }
-
-        tgBot.sendMessage(message.containerName, message.message) // todo: change to more friendly messages
+        return false
     }
 }
 
