@@ -10,21 +10,26 @@ import com.github.dockerjava.api.model.Frame
 import com.github.dockerjava.core.DefaultDockerClientConfig
 import com.github.dockerjava.core.DockerClientImpl
 import com.github.dockerjava.zerodep.ZerodepDockerHttpClient
+import me.underlow.tglog.messages.MessageReceiver
 import org.springframework.stereotype.Service
 
 @Service
-class DockerService {
+class DockerService(val messageReceiver: MessageReceiver) {
+
+    private val dockerClientConfig = DefaultDockerClientConfig.createDefaultConfigBuilder().build()
+    private val dockerHttpClient = ZerodepDockerHttpClient.Builder().dockerHost(dockerClientConfig.dockerHost).build()
+    private val dockerClient = DockerClientImpl.getInstance(dockerClientConfig, dockerHttpClient)
+
     init {
-        val dockerClientConfig = DefaultDockerClientConfig.createDefaultConfigBuilder().build()
-
-        val dockerHttpClient = ZerodepDockerHttpClient.Builder().dockerHost(dockerClientConfig.dockerHost).build()
-
-        val dockerClient = DockerClientImpl.getInstance(dockerClientConfig, dockerHttpClient)
         // List all containers
         val containers = dockerClient.listContainersCmd().exec()
 
         // Create an event listener
-        val callback = ContainerLifecycleListener(dockerClient)
+        val callback = object : Adapter<Event>() {
+            override fun onNext(event: Event) {
+                containerLifecycleListener(event)
+            }
+        }
 
         // Iterate through containers and get logs
         for (container in containers) {
@@ -35,54 +40,57 @@ class DockerService {
     }
 
 
-}
+    private fun attachLogListener(
+        container: Container,
+        dockerClient: DockerClient
+    ) {
+        val containerId = container.id
+        println("attachLogListener to Container ID: ${container.readableName()}")
 
-private fun attachLogListener(
-    container: Container,
-    dockerClient: DockerClient
-) {
-    val containerId = container.id
-    println("attachLogListener to Container ID: ${container.readableName()}")
+        // Get logs of the container
+        val currentTimeSeconds = System.currentTimeMillis() / 1000
+        val logContainerCmd: LogContainerCmd = dockerClient.logContainerCmd(containerId)
+            .withStdOut(true)
+            .withStdErr(true)
+            .withFollowStream(true)
+            .withSince(currentTimeSeconds.toInt())
 
-    // Get logs of the container
-    val currentTimeSeconds = System.currentTimeMillis() / 1000
-    val logContainerCmd: LogContainerCmd = dockerClient.logContainerCmd(containerId)
-        .withStdOut(true)
-        .withStdErr(true)
-        .withFollowStream(true)
-        .withSince(currentTimeSeconds.toInt())
-
-    val callback = object : Adapter<Frame>() {
-        override fun onNext(frame: Frame) {
-//            String.format("%s: %s", streamType, String(payload).trim { it <= ' ' })
-            println("${container.readableName()}:  ${frame.payload.decodeToString()}")
+        val callback = object : Adapter<Frame>() {
+            override fun onNext(frame: Frame) {
+                println("${container.readableName()}:  ${frame.payload.decodeToString()}")
+                messageReceiver.receiveMessage(container.readableName(), frame.payload.decodeToString())
+            }
         }
+
+        logContainerCmd.exec(callback)//.awaitCompletion()
     }
 
-    logContainerCmd.exec(callback)//.awaitCompletion()
 
-    println("=====================================")
-}
-
-
-private class ContainerLifecycleListener(val dockerClient: DockerClient) : Adapter<Event>() {
-    override fun onNext(event: Event) {
+    private fun containerLifecycleListener(event: Event) {
         println("Received event: ${event.type}, ${event.action}, ${event.actor?.attributes}")
 
+        if (event.type != EventType.CONTAINER)
+            return
+
         // Check if the event is a container creation event
-        if (event.type == EventType.CONTAINER && event.action == "start") {
-            val containerId = event.actor?.id ?: error("Container ID is null")
-            val container = dockerClient.listContainersCmd().exec().firstOrNull { it.id == containerId }
+        val containerId = event.actor?.id
 
-            if (container == null) {
-                println("Container might be removed: $containerId")
-                return
-            }
+        if (containerId == null) {
+            println("Container ID is null")
+            return
+        }
 
-            println("New container created: ${container.readableName()}")
+        val container = dockerClient.listContainersCmd().exec().firstOrNull { it.id == containerId }
 
-            // Perform actions based on container creation event
-            // For example, retrieve container details, inspect it, or perform additional tasks
+        if (container == null) {
+            println("Container might be removed: $containerId")
+            return
+        }
+
+        messageReceiver.receiveMessage(container.readableName(), event.action ?: "unknown action")
+        println("New container created: ${container.readableName()}")
+
+        if (event.action == "start") {
             attachLogListener(container, dockerClient)
         }
     }

@@ -1,5 +1,18 @@
-
 tgbot:
   botToken: telegram_bot_token
   chatId: telegram_chat_id
+
+log:
+  events:
+    include: "error"
+    exclude: "info"
+
+container:
+  events:
+    exclude:
+    include:
+  names:
+    include:
+    exclude:
+
 

@@ -1,7 +1,6 @@
 package me.underlow.tglog.tg
 
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.context.properties.bind.ConstructorBinding
 
 
 /**

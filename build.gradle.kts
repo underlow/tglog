@@ -48,6 +48,7 @@ dependencies {
 
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
