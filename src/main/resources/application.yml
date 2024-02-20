@@ -1,4 +1,5 @@
 
 tgbot:
   botToken: telegram_bot_token
+  chatId: telegram_chat_id
 
