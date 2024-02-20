@@ -56,6 +56,9 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging:${Versions.kotlinLogging}")
     implementation("org.springframework.boot:spring-boot-starter")
 
+    implementation("com.github.docker-java:docker-java:3.3.5")
+    implementation("com.github.docker-java:docker-java-transport-zerodep:3.3.5")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
         // exclude(module = "mockito-core")
