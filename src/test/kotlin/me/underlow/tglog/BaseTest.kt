@@ -1,11 +1,11 @@
 package me.underlow.tglog
 
+import jakarta.annotation.PostConstruct
 import org.jeasy.random.EasyRandom
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.test.context.ActiveProfiles
-import javax.annotation.PostConstruct
 
 
 @SpringBootTest(
@@ -16,15 +16,6 @@ import javax.annotation.PostConstruct
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 abstract class BaseTest {
-
-    @LocalServerPort
-    var port: Int = -1
-    private lateinit var host: String
-
-    @PostConstruct
-    fun init() {
-        host = "http://localhost:$port"
-    }
 
     protected val easyRandom = EasyRandom()
 

@@ -32,7 +32,6 @@ buildscript {
 
 repositories {
     mavenCentral()
-//        maven(url = "https://kotlin.bintray.com/kotlinx")
     maven(url = "https://maven.google.com")
 
 }
@@ -45,11 +44,6 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
-dependencyManagement {
-    imports {
-        mavenBom( "org.springframework.cloud:spring-cloud-dependencies:${Versions.springCloudDependency}")
-    }
-}
 dependencies {
 
     implementation(kotlin("stdlib-jdk8"))
@@ -57,9 +51,10 @@ dependencies {
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
-    implementation("com.github.pengrad:java-telegram-bot-api:6.3.0")
+    implementation("com.github.pengrad:java-telegram-bot-api:7.0.1")
     implementation("ch.qos.logback:logback-classic")
     implementation("io.github.microutils:kotlin-logging:${Versions.kotlinLogging}")
+    implementation("org.springframework.boot:spring-boot-starter")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
@@ -71,14 +66,13 @@ dependencies {
 
     testImplementation("io.kotest:kotest-assertions-core:${Versions.kotest}")
 
-    testImplementation("org.testcontainers:postgresql:1.17.6")
-    testImplementation("org.testcontainers:junit-jupiter:1.17.6")
+    testImplementation("org.testcontainers:junit-jupiter:${Versions.testContainers}")
     // https://github.com/testcontainers/testcontainers-java/issues/3834
     // these lines required for Mac M1 at least for now
     testImplementation("net.java.dev.jna:jna-platform:5.8.0")
     testImplementation("net.java.dev.jna:jna:5.8.0")
     testImplementation("org.jeasy:easy-random-core:5.0.0")
-    testImplementation ("org.mockito.kotlin:mockito-kotlin:5.2.1")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
 }
 
 springBoot {
