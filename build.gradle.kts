@@ -1,5 +1,3 @@
-import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
-
 repositories {
     mavenCentral()
     maven(url = "https://maven.google.com")
@@ -67,9 +65,11 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:${Versions.jupiter}")
     testImplementation("org.junit.jupiter:junit-jupiter-params:${Versions.jupiter}")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:${Versions.jupiter}")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:${Versions.jupiter}")
 
     testImplementation("io.kotest:kotest-assertions-core:${Versions.kotest}")
 
+    testImplementation("org.testcontainers:testcontainers:${Versions.testContainers}")
     testImplementation("org.testcontainers:junit-jupiter:${Versions.testContainers}")
     // https://github.com/testcontainers/testcontainers-java/issues/3834
     // these lines required for Mac M1 at least for now

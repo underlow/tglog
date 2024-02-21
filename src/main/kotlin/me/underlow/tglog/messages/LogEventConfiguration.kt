@@ -1,5 +1,8 @@
 import org.springframework.boot.context.properties.ConfigurationProperties
 
+/**
+ * all include/exclude properties are comma separated lists of values
+ */
 @ConfigurationProperties("log.events")
 data class LogEventConfiguration(
     val include: String = "",

@@ -27,4 +27,4 @@ sealed interface Message{
 }
 
 data class LogMessage(override val containerName: String, val message: String) : Message
-data class ContainerMessage(override val containerName: String, val message: String) : Message
+data class ContainerMessage(override val containerName: String, val event: String) : Message
