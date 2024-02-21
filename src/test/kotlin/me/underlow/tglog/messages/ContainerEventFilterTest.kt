@@ -1,6 +1,7 @@
 package me.underlow.tglog.messages
 
 import ContainerEventsConfiguration
+import LogEventConfiguration
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
@@ -34,10 +35,10 @@ enum class ContainerEventFilterTestParams(
         false
     ),
 
-    `if include list is empty then message is included (no filtering for empty include list)`(
+    `if include list is empty then message is excluded`(
         ContainerEventsConfiguration(),
         ContainerMessage("container1", "event1"),
-        true
+        false
     ),
     `if include list is not empty and event is not in include list, message is excluded`(
         ContainerEventsConfiguration(include = "event2"),
@@ -62,10 +63,25 @@ enum class ContainerEventFilterTestParams(
         false
     ),
 
-    `if container event is not in exclude list and include list is empty, message is included`(
+    `if container event is not in exclude list and include list is empty, message is excluded`(
         ContainerEventsConfiguration(exclude = "event2"),
         ContainerMessage("container1", "event1"),
+        false
+    ),
+    `if container event is in exclude list and in include list, message is excluded`(
+        ContainerEventsConfiguration(exclude = "container1", include = "container1"),
+        ContainerMessage("container1", "event2"),
+        false
+    ),
+    `if container event is not in exclude list and include list is star, message is included`(
+        ContainerEventsConfiguration(include = "*", exclude = "container2"),
+        ContainerMessage("container1","event1"),
         true
+    ),
+    `if container event is in exclude list and include list is star, message is excluded`(
+        ContainerEventsConfiguration(include = "*", exclude = "event1"),
+        ContainerMessage("container1","event1"),
+        false
     ),
 }
 
