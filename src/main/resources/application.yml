@@ -9,10 +9,10 @@ log:
 
 container:
   events:
-    include: *
+    include: "*"
     exclude:
   names:
-    include: *
+    include: "*"
     exclude:
 
 
