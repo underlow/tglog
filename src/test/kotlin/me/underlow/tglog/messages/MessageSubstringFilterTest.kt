@@ -35,10 +35,10 @@ enum class MessageSubstringFilterTestParams(
         false
     ),
 
-    `if include list is empty then message is included (no filtering for empty include list)`(
+    `if include list is empty then message is excluded`(
         LogEventConfiguration(),
         LogMessage("name1","event1"),
-        true
+        false
     ),
 
     `if include list is not empty and message does not contain substring in include list, message is excluded`(
@@ -65,9 +65,24 @@ enum class MessageSubstringFilterTestParams(
         false
     ),
 
-    `if message substring is not in exclude list and include list is empty, message is included`(
+    `if message substring is not in exclude list and include list is empty, message is excluded`(
         LogEventConfiguration(include = "", exclude = "substring2"),
         LogMessage("name1","event1"),
+        false
+    ),
+    `if message substring is in exclude list and in include list, message is excluded`(
+        LogEventConfiguration(include = "substring2", exclude = "substring2"),
+        LogMessage("name1","event1 contains substring2"),
+        false
+    ),
+    `if message substring is not in exclude list and include list is star, message is included`(
+        LogEventConfiguration(include = "*", exclude = "substring1"),
+        LogMessage("name1","event1 contains substring2"),
         true
+    ),
+    `if message substring is in exclude list and include list is star, message is excluded`(
+        LogEventConfiguration(include = "*", exclude = "substring2"),
+        LogMessage("name1","event1 contains substring2"),
+        false
     ),
 }

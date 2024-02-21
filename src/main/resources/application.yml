@@ -5,7 +5,7 @@ tgbot:
 log:
   events:
     include: "error"
-    exclude: "info"
+    exclude:
 
 container:
   events:
