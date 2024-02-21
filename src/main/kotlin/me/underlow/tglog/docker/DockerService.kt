@@ -71,10 +71,12 @@ class DockerService(val messageReceiver: MessageReceiver) {
 
 
     private fun containerLifecycleListener(event: Event) {
-        logger.debug { "Received event: ${event.type}, ${event.action}, ${event.actor?.attributes}" }
+        logger.debug { "Received event: ${event.actor?.id} : ${event.type}, ${event.action}" }
 
-        if (event.type != EventType.CONTAINER)
+        if (event.type != EventType.CONTAINER) {
+            logger.debug { "Not a container event type ${event.type}" }
             return
+        }
 
         // Check if the event is a container creation event
         val containerId = event.actor?.id

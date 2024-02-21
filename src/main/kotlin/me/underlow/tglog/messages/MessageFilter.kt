@@ -48,6 +48,7 @@ class MessageFilter(
         if (!containerEventFilter.filter(message))
             return
 
+        logger.debug { "Sending message ${TgMessage.readableMessage(message)} " }
         tgBot.sendMessage(TgMessage.readableMessage(message))
     }
 
@@ -58,6 +59,7 @@ class MessageFilter(
         if (!messageSubstringFilter.filter(message))
             return
 
+        logger.debug { "Sending message ${TgMessage.readableMessage(message)} " }
         tgBot.sendMessage(TgMessage.readableMessage(message))
     }
 }
