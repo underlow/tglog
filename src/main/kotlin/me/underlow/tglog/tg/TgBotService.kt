@@ -21,8 +21,8 @@ class TgBotService(
         logger.info { "Telegram Bot successfully initialized" }
     }
 
-    fun sendMessage(containerName: String, fullMessage: String): Int {
-        val sendMessage = SendMessage(configuration.chatId, "<b>$containerName</b>\n $fullMessage")
+    fun sendMessage(fullMessage: String): Int {
+        val sendMessage = SendMessage(configuration.chatId, fullMessage)
             .parseMode(ParseMode.HTML)
             .disableWebPagePreview(true)
 

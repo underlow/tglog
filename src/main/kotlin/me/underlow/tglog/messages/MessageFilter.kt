@@ -7,6 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import me.underlow.tglog.tg.TgBotService
+import me.underlow.tglog.tg.TgMessage
 import mu.KotlinLogging
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Service
@@ -35,6 +36,7 @@ class MessageFilter(
             }
         }
     }
+
     private val containerNameFilter = ContainerNameFilter(containerNamesConfiguration)
     private val containerEventFilter = ContainerEventFilter(containerEventsConfiguration)
     private val messageSubstringFilter = MessageSubstringFilter(logEventConfiguration)
@@ -46,7 +48,7 @@ class MessageFilter(
         if (!containerEventFilter.filter(message))
             return
 
-        tgBot.sendMessage(message.containerName, message.event) // todo: change to more friendly messages
+        tgBot.sendMessage(TgMessage.readableMessage(message))
     }
 
     private fun processLogMessage(message: LogMessage) {
@@ -56,7 +58,7 @@ class MessageFilter(
         if (!messageSubstringFilter.filter(message))
             return
 
-        tgBot.sendMessage(message.containerName, message.message) // todo: change to more friendly messages
+        tgBot.sendMessage(TgMessage.readableMessage(message))
     }
 }
 
