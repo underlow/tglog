@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
+import mu.KotlinLogging
 import org.springframework.stereotype.Service
 
 @Service
@@ -12,7 +13,7 @@ class MessageReceiver {
     val queue = Channel<Message>()
 
     fun receiveMessage(message: Message) {
-        println("Received message $message")
+        logger.trace {"Received message $message"}
         coroutineScope.launch {
             queue.send(message)
         }
@@ -28,3 +29,5 @@ sealed interface Message{
 
 data class LogMessage(override val containerName: String, val message: String) : Message
 data class ContainerMessage(override val containerName: String, val event: String) : Message
+
+private val logger = KotlinLogging.logger { }

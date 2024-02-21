@@ -22,6 +22,8 @@ class TgBotService(
     }
 
     fun sendMessage(fullMessage: String): Int {
+        logger.debug { "Sending message: $fullMessage" }
+        return 1
         val sendMessage = SendMessage(configuration.chatId, fullMessage)
             .parseMode(ParseMode.HTML)
             .disableWebPagePreview(true)

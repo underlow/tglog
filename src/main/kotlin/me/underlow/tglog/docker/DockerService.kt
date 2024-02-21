@@ -13,6 +13,7 @@ import com.github.dockerjava.zerodep.ZerodepDockerHttpClient
 import me.underlow.tglog.messages.ContainerMessage
 import me.underlow.tglog.messages.LogMessage
 import me.underlow.tglog.messages.MessageReceiver
+import mu.KotlinLogging
 import org.springframework.stereotype.Service
 
 @Service
@@ -47,7 +48,7 @@ class DockerService(val messageReceiver: MessageReceiver) {
         dockerClient: DockerClient
     ) {
         val containerId = container.id
-        println("attachLogListener to Container ID: ${container.readableName()}")
+        logger.info { "attachLogListener to Container ID: ${container.readableName()}" }
 
         // Get logs of the container
         val currentTimeSeconds = System.currentTimeMillis() / 1000
@@ -59,8 +60,9 @@ class DockerService(val messageReceiver: MessageReceiver) {
 
         val callback = object : Adapter<Frame>() {
             override fun onNext(frame: Frame) {
-                println("${container.readableName()}:  ${frame.payload.decodeToString()}")
-                messageReceiver.receiveMessage(LogMessage(container.readableName(), frame.payload.decodeToString()))
+                val message = LogMessage(container.readableName(), frame.payload.decodeToString().trim { it <= ' ' })
+                logger.trace { "Received log message: $message" }
+                messageReceiver.receiveMessage(message)
             }
         }
 
@@ -69,7 +71,7 @@ class DockerService(val messageReceiver: MessageReceiver) {
 
 
     private fun containerLifecycleListener(event: Event) {
-        println("Received event: ${event.type}, ${event.action}, ${event.actor?.attributes}")
+        logger.debug { "Received event: ${event.type}, ${event.action}, ${event.actor?.attributes}" }
 
         if (event.type != EventType.CONTAINER)
             return
@@ -78,24 +80,27 @@ class DockerService(val messageReceiver: MessageReceiver) {
         val containerId = event.actor?.id
 
         if (containerId == null) {
-            println("Container ID is null")
+            logger.debug { "Container ID is null" }
             return
         }
 
         val container = dockerClient.listContainersCmd().exec().firstOrNull { it.id == containerId }
 
         if (container == null) {
-            println("Container might be removed: $containerId")
+            messageReceiver.receiveMessage(ContainerMessage(containerId, event.action ?: "unknown action"))
+            logger.debug { "Container might be removed: $containerId" }
             return
         }
 
         messageReceiver.receiveMessage(ContainerMessage(container.readableName(), event.action ?: "unknown action"))
-        println("New container created: ${container.readableName()}")
 
         if (event.action == "start") {
+            logger.info { "New container created: ${container.readableName()}" }
             attachLogListener(container, dockerClient)
         }
     }
 }
 
 private fun Container.readableName() = names.joinToString(",") { it.removePrefix("/") }
+
+private val logger = KotlinLogging.logger { }
