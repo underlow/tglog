@@ -8,12 +8,15 @@ import mu.KotlinLogging
  * @param configuration configuration for container names
  * filtering rules are:
  * 1. if container name is in exclude list, message is excluded
- * 2. if include list is empty message is included (no filtering for empty include list)
- * 2. if include list is not empty and container name is not in include list, message is excluded
+ * 2. if include list is empty message is excluded
+ * 3. if include list is not empty and container name is not in include list, message is excluded
+ * 4. if include list is '*' then all containers (except excluded) are included
  *
  * @return true if message should be included, false if message should be excluded
  */
 class ContainerNameFilter(private val configuration: ContainerNamesConfiguration) {
+    private val includeAll = configuration.include == "*"
+
     private val include = configuration.include.split(",").filter { it.isNotBlank() }.toSet()
     private val exclude = configuration.exclude.split(",").filter { it.isNotBlank() }.toSet()
 
@@ -23,12 +26,16 @@ class ContainerNameFilter(private val configuration: ContainerNamesConfiguration
             return false
         }
 
-        if (include.isNotEmpty() && message.containerName !in include
-        ) {
-            logger.debug { "Container ${message.containerName} is not included in processing" }
-            return false
+        if (includeAll) {
+            return true
         }
-        return true
+
+        if (message.containerName in include) {
+            return true
+        }
+
+        logger.debug { "Container ${message.containerName} is not included in processing" }
+        return false
     }
 }
 

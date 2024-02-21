@@ -35,10 +35,10 @@ enum class ContainerNameFilterTestParams(
         false
     ),
 
-    `if include list is empty then message is included (no filtering for empty include list)`(
+    `if include list is empty then message is excluded`(
         ContainerNamesConfiguration(),
         ContainerMessage("name1","event1"),
-        true
+        false
     ),
 
     `if include list is not empty and name is not in include list, message is excluded`(
@@ -63,9 +63,24 @@ enum class ContainerNameFilterTestParams(
         false
     ),
 
-    `if container name is not in exclude list and include list is empty, message is included`(
+    `if container name is not in exclude list and include list is empty, message is excluded`(
         ContainerNamesConfiguration(include = "", exclude = "name2"),
         ContainerMessage("name1","event1"),
+        false
+    ),
+    `if container name is in exclude list and in include list, message is excluded`(
+        ContainerNamesConfiguration(exclude = "container1", include = "container1"),
+        ContainerMessage("container1", "event2"),
+        false
+    ),
+    `if container name is not in exclude list and include list is star, message is included`(
+        ContainerNamesConfiguration(include = "*", exclude = "container2"),
+        ContainerMessage("container1","event1"),
         true
+    ),
+    `if container name is in exclude list and include list is star, message is excluded`(
+        ContainerNamesConfiguration(include = "*", exclude = "container1"),
+        ContainerMessage("container1","event1"),
+        false
     ),
 }
