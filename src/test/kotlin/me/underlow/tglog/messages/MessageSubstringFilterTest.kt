@@ -85,4 +85,14 @@ enum class MessageSubstringFilterTestParams(
         LogMessage("name1","event1 contains substring2"),
         false
     ),
+    `message substring should match exclude list even if it in different cases`(
+        LogEventConfiguration(include = "*", exclude = "SUBSTRING2"),
+        LogMessage("name1","event1 contains substring2"),
+        false
+    ),
+    `message substring should match include list even if it in different cases`(
+        LogEventConfiguration(include = "substring2"),
+        LogMessage("name1","EVENT1 CONTAINS SUBSTRING2"),
+        true
+    ),
 }
