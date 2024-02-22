@@ -32,6 +32,12 @@ class MessageFilter(
 
     init {
         logger.debug { "Starting message filter" }
+
+        logger.debug { "logsEventConfiguration: $logsEventConfiguration" }
+        logger.debug { "containerEventsConfiguration: $containerEventsConfiguration" }
+        logger.debug { "containerNamesConfiguration: $containerNamesConfiguration" }
+        logger.debug { "containersProperties: $containersProperties" }
+
         coroutineScope.launch {
             for (message in messageReceiver.messageChannel) {
                 when (message) {
