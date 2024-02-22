@@ -83,6 +83,16 @@ enum class ContainerEventFilterTestParams(
         ContainerMessage("container1","event1"),
         false
     ),
+    `event should be filtered correctly if event in lowercase and configuration in uppercase`(
+        ContainerEventsConfiguration(include = "*", exclude = "EVENT1"),
+        ContainerMessage("container1","event1"),
+        false
+    ),
+    `event should be filtered correctly if event in upperxcase and configuration in lowercase`(
+        ContainerEventsConfiguration(include = "*", exclude = "event1"),
+        ContainerMessage("container1","EVENT1"),
+        false
+    ),
 }
 
 

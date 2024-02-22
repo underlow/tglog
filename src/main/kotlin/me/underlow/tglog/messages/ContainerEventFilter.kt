@@ -17,11 +17,11 @@ import mu.KotlinLogging
 class ContainerEventFilter(private val configuration: ContainerEventsConfiguration) {
     private val includeAll = configuration.include == "*"
 
-    private val include = configuration.include.split(",").filter { it.isNotBlank() }.toSet()
-    private val exclude = configuration.exclude.split(",").filter { it.isNotBlank() }.toSet()
+    private val include = configuration.include.split(",").filter { it.isNotBlank() }.map { it.lowercase() }.toSet()
+    private val exclude = configuration.exclude.split(",").filter { it.isNotBlank() }.map { it.lowercase() }.toSet()
 
     fun filter(message: ContainerMessage): Boolean {
-        if (message.event in exclude) {
+        if (message.event.lowercase() in exclude) {
             logger.debug { "Message ${message.event} is excluded from processing" }
             return false
         }
@@ -29,7 +29,7 @@ class ContainerEventFilter(private val configuration: ContainerEventsConfigurati
         if (includeAll)
             return true
 
-        if (message.event in include) {
+        if (message.event.lowercase() in include) {
             return true
         }
 
