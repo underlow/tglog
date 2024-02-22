@@ -28,8 +28,8 @@ data class ContainersProperties(
 
 data class ContainerProperties(
     val name: String,
-    val logs: LogsEvents,
-    val container: ContainerEvents
+    val logs: LogsEvents = LogsEvents(events = LogsEventConfiguration()),
+    val container: ContainerEvents = ContainerEvents(events = ContainerEventsConfiguration())
 )
 
 data class ContainerEvents (
