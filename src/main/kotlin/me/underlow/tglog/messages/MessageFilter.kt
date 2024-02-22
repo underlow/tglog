@@ -2,6 +2,7 @@ package me.underlow.tglog.messages
 
 import ContainerEventsConfiguration
 import ContainerNamesConfiguration
+import ContainerProperties
 import ContainersProperties
 import LogsEventConfiguration
 import kotlinx.coroutines.CoroutineScope
@@ -45,7 +46,14 @@ class MessageFilter(
     private val containerEventFilter = ContainerEventFilter(containerEventsConfiguration)
     private val messageSubstringFilter = MessageSubstringFilter(logsEventConfiguration)
 
+    // map container name -> container filter
+    private val containerFilters = containersProperties.container.associate { it.name to it.toContainerFilters() }
+
     private fun processContainerMessage(message: ContainerMessage) {
+        val containerFilters = containerFilters[message.containerName]
+        if (containerFilters != null && !containerFilters.containerEvents.filter(message))
+            return
+
         if (!containerNameFilter.filter(message))
             return
 
@@ -57,6 +65,10 @@ class MessageFilter(
     }
 
     private fun processLogMessage(message: LogMessage) {
+        val containerFilters = containerFilters[message.containerName]
+        if (containerFilters != null && !containerFilters.messageSubstring.filter(message))
+            return
+
         if (!containerNameFilter.filter(message))
             return
 
@@ -67,6 +79,18 @@ class MessageFilter(
         tgBot.sendMessage(TgMessage.readableMessage(message))
     }
 }
+
+private fun ContainerProperties.toContainerFilters(): ContainerFilters {
+    return ContainerFilters(
+        containerEvents = ContainerEventFilter(this.container.events),
+        messageSubstring = MessageSubstringFilter(this.logs.events),
+    )
+}
+
+data class ContainerFilters(
+    val containerEvents: ContainerEventFilter,
+    val messageSubstring: MessageSubstringFilter,
+)
 
 private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
