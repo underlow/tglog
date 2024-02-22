@@ -83,4 +83,14 @@ enum class ContainerNameFilterTestParams(
         ContainerMessage("container1","event1"),
         false
     ),
+    `container name should match  exclude list when name is in uppercase and list is in lowercase`(
+        ContainerNamesConfiguration(include = "*", exclude = "container1"),
+        ContainerMessage("CONTAINER1","event1"),
+        false
+    ),
+    `container name should match  exclude list when name is in lowercase and list is in uppercase`(
+        ContainerNamesConfiguration(include = "*", exclude = "CONTAINER1"),
+        ContainerMessage("container1","event1"),
+        false
+    ),
 }

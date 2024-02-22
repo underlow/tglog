@@ -17,11 +17,11 @@ import mu.KotlinLogging
 class ContainerNameFilter(private val configuration: ContainerNamesConfiguration) {
     private val includeAll = configuration.include == "*"
 
-    private val include = configuration.include.split(",").filter { it.isNotBlank() }.toSet()
-    private val exclude = configuration.exclude.split(",").filter { it.isNotBlank() }.toSet()
+    private val include = configuration.include.split(",").filter { it.isNotBlank() }.map { it.lowercase() }.toSet()
+    private val exclude = configuration.exclude.split(",").filter { it.isNotBlank() }.map { it.lowercase() }.toSet()
 
     fun filter(message: Message): Boolean {
-        if (message.containerName in exclude) {
+        if (message.containerName.lowercase() in exclude) {
             logger.debug { "Container ${message.containerName} is excluded from processing" }
             return false
         }
@@ -30,7 +30,7 @@ class ContainerNameFilter(private val configuration: ContainerNamesConfiguration
             return true
         }
 
-        if (message.containerName in include) {
+        if (message.containerName.lowercase() in include) {
             return true
         }
 
