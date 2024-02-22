@@ -22,7 +22,7 @@ class TgBotService(
     }
 
     fun sendMessage(fullMessage: String): Int {
-        logger.debug { "Sending message: $fullMessage" }
+        logger.debug { "Sending message: $fullMessage to chatId: ${configuration.chatId}" }
         val sendMessage = SendMessage(configuration.chatId, fullMessage)
             .parseMode(ParseMode.HTML)
             .disableWebPagePreview(true)
@@ -31,8 +31,8 @@ class TgBotService(
 
         if (!sendResponse.isOk) {
             //todo: retries
-            logger.error { "Error while sending message: ${sendResponse.description()}" }
-            throw Exception("Error while sending message: ${sendResponse.description()}")
+            logger.error { "Error while sending message: ${sendResponse.description()} error: ${sendResponse.errorCode()}" }
+            throw Exception("Error while sending message: ${sendResponse.description()} error: ${sendResponse.errorCode()}")
         }
 
         return sendResponse.message().messageId()
