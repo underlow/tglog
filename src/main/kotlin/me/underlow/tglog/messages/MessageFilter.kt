@@ -28,7 +28,7 @@ class MessageFilter(
 
     init {
         coroutineScope.launch {
-            for (message in messageReceiver.queue) {
+            for (message in messageReceiver.messageChannel) {
                 when (message) {
                     is LogMessage -> processLogMessage(message)
                     is ContainerMessage -> processContainerMessage(message)

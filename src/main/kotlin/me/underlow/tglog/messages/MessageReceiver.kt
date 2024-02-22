@@ -10,12 +10,12 @@ import org.springframework.stereotype.Service
 @Service
 class MessageReceiver {
 
-    val queue = Channel<Message>()
+    val messageChannel = Channel<Message>()
 
     fun receiveMessage(message: Message) {
         logger.trace {"Received message $message"}
         coroutineScope.launch {
-            queue.send(message)
+            messageChannel.send(message)
         }
     }
 }
