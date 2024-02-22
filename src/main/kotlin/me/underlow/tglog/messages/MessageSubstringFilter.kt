@@ -1,6 +1,6 @@
 package me.underlow.tglog.messages
 
-import LogEventConfiguration
+import LogsEventConfiguration
 import mu.KotlinLogging
 
 /**
@@ -14,7 +14,7 @@ import mu.KotlinLogging
  *
  * @return true if message should be included, false if message should be excluded
  */
-class MessageSubstringFilter(private val configuration: LogEventConfiguration) {
+class MessageSubstringFilter(private val configuration: LogsEventConfiguration) {
     private val includeAll = configuration.include == "*"
     private val include = configuration.include.split(",").filter { it.isNotBlank() }.map { it.lowercase() }.toSet()
     private val exclude = configuration.exclude.split(",").filter { it.isNotBlank() }.map { it.lowercase() }.toSet()

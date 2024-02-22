@@ -1,7 +1,6 @@
 package me.underlow.tglog.messages
 
 import ContainerEventsConfiguration
-import LogEventConfiguration
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource

@@ -2,7 +2,8 @@ package me.underlow.tglog.messages
 
 import ContainerEventsConfiguration
 import ContainerNamesConfiguration
-import LogEventConfiguration
+import ContainersProperties
+import LogsEventConfiguration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -14,19 +15,22 @@ import org.springframework.stereotype.Service
 
 @Service
 @EnableConfigurationProperties(
-    LogEventConfiguration::class,
+    LogsEventConfiguration::class,
     ContainerEventsConfiguration::class,
-    ContainerNamesConfiguration::class
+    ContainerNamesConfiguration::class,
+    ContainersProperties::class,
 )
 class MessageFilter(
     private val messageReceiver: MessageReceiver,
-    private val logEventConfiguration: LogEventConfiguration,
+    private val logsEventConfiguration: LogsEventConfiguration,
     private val containerEventsConfiguration: ContainerEventsConfiguration,
     private val containerNamesConfiguration: ContainerNamesConfiguration,
+    private val containersProperties: ContainersProperties,
     private val tgBot: TgBotService
 ) {
 
     init {
+        logger.debug { "Starting message filter" }
         coroutineScope.launch {
             for (message in messageReceiver.messageChannel) {
                 when (message) {
@@ -39,7 +43,7 @@ class MessageFilter(
 
     private val containerNameFilter = ContainerNameFilter(containerNamesConfiguration)
     private val containerEventFilter = ContainerEventFilter(containerEventsConfiguration)
-    private val messageSubstringFilter = MessageSubstringFilter(logEventConfiguration)
+    private val messageSubstringFilter = MessageSubstringFilter(logsEventConfiguration)
 
     private fun processContainerMessage(message: ContainerMessage) {
         if (!containerNameFilter.filter(message))

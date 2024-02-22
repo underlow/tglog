@@ -2,7 +2,7 @@ tgbot:
   botToken: telegram_bot_token
   chatId: telegram_chat_id
 
-log:
+logs:
   events:
     include: "error"
     exclude:
@@ -15,4 +15,24 @@ container:
     include: "*"
     exclude:
 
+containers:
+  container:
+    - name: "some container name"
+      logs:
+        events:
+          include: "error"
+          exclude:
+      container:
+        events:
+          include: "*"
+          exclude:
+    - name: "another container name"
+      logs:
+        events:
+          include: "error"
+          exclude:
+      container:
+        events:
+          include: "*"
+          exclude:
 
