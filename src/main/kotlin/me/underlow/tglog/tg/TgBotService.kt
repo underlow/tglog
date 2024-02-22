@@ -26,19 +26,35 @@ class TgBotService(
 
     fun sendMessage(fullMessage: String): Int {
         logger.debug { "Sending message: $fullMessage to chatId: ${configuration.chatId}" }
-        val sendMessage = SendMessage(configuration.chatId, fullMessage)
-            .parseMode(ParseMode.HTML)
-            .disableWebPagePreview(true)
+        // instead of implementing complex wait logic to prevent bot from getting Too Many Requests
+        // we can just sleep for a while. nobody will need more than 1 message per second
+        Thread.sleep(500)
 
-        val sendResponse = bot.execute(sendMessage)
+        // nothing complicated here, let's do 3 retry attempts and then skip
+        repeat(3) {
+            try {
+                val sendMessage = SendMessage(configuration.chatId, fullMessage)
+                    .parseMode(ParseMode.HTML)
+                    .disableWebPagePreview(true)
 
-        if (!sendResponse.isOk) {
-            //todo: retries
-            logger.error { "Error while sending message: ${sendResponse.description()} error: ${sendResponse.errorCode()}" }
-            throw Exception("Error while sending message: ${sendResponse.description()} error: ${sendResponse.errorCode()}")
+                val sendResponse = bot.execute(sendMessage)
+
+                if (!sendResponse.isOk) {
+                    logger.info { "Error while sending message: ${sendResponse.description()} error: ${sendResponse.errorCode()}" }
+                    return@repeat
+                }
+
+                return sendResponse.message().messageId()
+            } catch (e: Exception) {
+                logger.error(e) { "Error while sending message, retrying" }
+                Thread.sleep(1000)
+            }
         }
 
-        return sendResponse.message().messageId()
+        // if we got here it means that sending message failed 3 times
+        logger.error { "Error sending message: $fullMessage to chatId: ${configuration.chatId}" }
+        // do not throw exception to avoid stopping the whole process
+        return -1
     }
 }
 
