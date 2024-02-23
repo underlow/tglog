@@ -8,8 +8,8 @@ import LogsEventConfiguration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import me.underlow.tglog.tg.TgBotService
 import me.underlow.tglog.tg.TgMessage
+import me.underlow.tglog.tg.TgSender
 import mu.KotlinLogging
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Service
@@ -27,7 +27,7 @@ class MessageFilter(
     private val containerEventsConfiguration: ContainerEventsConfiguration,
     private val containerNamesConfiguration: ContainerNamesConfiguration,
     private val containersProperties: ContainersProperties,
-    private val tgBot: TgBotService
+    private val tgSender: TgSender
 ) {
 
     init {
@@ -67,7 +67,9 @@ class MessageFilter(
             return
 
         logger.debug { "Sending message ${TgMessage.readableMessage(message)} " }
-        tgBot.sendMessage(TgMessage.readableMessage(message))
+        coroutineScope.launch {
+            tgSender.messageChannel.send(message)
+        }
     }
 
     private fun processLogMessage(message: LogMessage) {
@@ -82,7 +84,9 @@ class MessageFilter(
             return
 
         logger.debug { "Sending message ${TgMessage.readableMessage(message)} " }
-        tgBot.sendMessage(TgMessage.readableMessage(message))
+        coroutineScope.launch {
+            tgSender.messageChannel.send(message)
+        }
     }
 }
 
