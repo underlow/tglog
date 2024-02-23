@@ -121,6 +121,8 @@ docker run --rm  -v /var/run/docker.sock:/var/run/docker.sock  -e TELEGRAM_BOT_T
 
 ### running with docker-compose
 
+Properties like `containers.container[0].name` should be converted to `CONTAINERS_CONTAINER_0_NAME`
+
 ```yaml 
 version: '3.7'
 services:
