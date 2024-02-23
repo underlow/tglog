@@ -1,0 +1,14 @@
+version: '3.7'
+services:
+  tglog:
+    build: .
+    container_name: tglog
+    restart: always
+    environment:
+      - TELEGRAM_BOT_TOKEN=your_bot_token
+      - TELEGRAM_CHAT_ID=your_chat_id
+      - CONTAINER_NAMES_EXCLUDE=
+      - CONTAINERS_CONTAINER_0_NAME=postgres
+      - CONTAINERS_CONTAINER_0_LOGS_EVENTS_EXCLUDE="database,something"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
