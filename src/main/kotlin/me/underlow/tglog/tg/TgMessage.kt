@@ -15,7 +15,7 @@ object TgMessage {
     }
 
     private fun logMessage(message: LogMessage) =
-        "Container <b>${message.containerName}</b> ${message.message}"
+        "Container <b>${message.containerName}</b>\n\n ${message.message}"
 
     private fun containerMessage(message: ContainerMessage): String {
         val eventText = when (message.event) {
