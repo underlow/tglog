@@ -14,6 +14,8 @@ Listens to all running docker containers and send selected log messages to teleg
 
 Exclude has higher priority than include. If you want to include all logs(or events), set include to `*` and exclude to empty list.
 
+[default values](src/main/resources/application.yml)
+
 ```yaml
 
 tgbot:
