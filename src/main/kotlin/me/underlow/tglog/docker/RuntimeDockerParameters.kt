@@ -14,7 +14,7 @@ class RuntimeDockerParameters {
     val containerId = getContainerIdFromRuntime()
 
     init {
-        logger.info { "Running in docker: $runningInDocker, docker host: $dockerHost, containerName: $containerId" }
+        logger.info { "Running in docker: $runningInDocker, docker host: $dockerHost, containerId: $containerId" }
     }
 
     fun getContainerIdFromRuntime(): String {

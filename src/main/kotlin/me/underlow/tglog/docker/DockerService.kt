@@ -49,7 +49,8 @@ class DockerService(val messageReceiver: MessageReceiver, private val runtimeDoc
     ) {
         val containerId = container.id
 
-        if (containerId == runtimeDockerParameters.containerId){
+        // I don't know any other way
+        if (containerId.startsWith(runtimeDockerParameters.containerId)){
             logger.info { "Do not attach listener to self: ${container.readableName()}" }
             return
         }

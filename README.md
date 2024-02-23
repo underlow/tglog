@@ -13,11 +13,11 @@ docker build -t tglog:latest .
 
 Then you can run it with:
 ```bash 
-docker run --rm  tglog
+docker run --rm  -v /var/run/docker.sock:/var/run/docker.sock tglog
 ```
 or in one line: 
 ```bash
-./gradlew clean build && docker build -t tglog:latest . && docker run --rm  tglog
+./gradlew clean build && docker build -t tglog:latest . && docker run --rm  -v /var/run/docker.sock:/var/run/docker.sock tglog
 ```
 
 ### running with docker-compose
