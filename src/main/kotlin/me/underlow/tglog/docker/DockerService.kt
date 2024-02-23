@@ -17,7 +17,7 @@ import mu.KotlinLogging
 import org.springframework.stereotype.Service
 
 @Service
-class DockerService(val messageReceiver: MessageReceiver) {
+class DockerService(val messageReceiver: MessageReceiver, private val runtimeDockerParameters: RuntimeDockerParameters) {
 
     private val dockerClientConfig = DefaultDockerClientConfig.createDefaultConfigBuilder().build()
     private val dockerHttpClient = ZerodepDockerHttpClient.Builder().dockerHost(dockerClientConfig.dockerHost).build()
@@ -48,6 +48,12 @@ class DockerService(val messageReceiver: MessageReceiver) {
         dockerClient: DockerClient
     ) {
         val containerId = container.id
+
+        if (containerId == runtimeDockerParameters.containerId){
+            logger.info { "Do not attach listener to self: ${container.readableName()}" }
+            return
+        }
+
         logger.info { "attachLogListener to Container ID: ${container.readableName()}" }
 
         // Get logs of the container
