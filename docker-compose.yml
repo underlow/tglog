@@ -7,6 +7,7 @@ services:
     environment:
       - TELEGRAM_BOT_TOKEN=your_bot_token
       - TELEGRAM_CHAT_ID=your_chat_id
+      - TGLOG_CONTAINER_NAME=your_container_name
       - CONTAINER_NAMES_EXCLUDE=
       - CONTAINERS_CONTAINER_0_NAME=postgres
       - CONTAINERS_CONTAINER_0_LOGS_EVENTS_EXCLUDE="database,something"

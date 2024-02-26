@@ -10,21 +10,32 @@ import com.github.dockerjava.api.model.Frame
 import com.github.dockerjava.core.DefaultDockerClientConfig
 import com.github.dockerjava.core.DockerClientImpl
 import com.github.dockerjava.zerodep.ZerodepDockerHttpClient
+import jakarta.annotation.PostConstruct
 import me.underlow.tglog.messages.ContainerMessage
 import me.underlow.tglog.messages.LogMessage
 import me.underlow.tglog.messages.MessageReceiver
 import mu.KotlinLogging
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
 @Service
-class DockerService(val messageReceiver: MessageReceiver, private val runtimeDockerParameters: RuntimeDockerParameters) {
+class DockerService(
+    val messageReceiver: MessageReceiver,
+    private val runtimeDockerParameters: RuntimeDockerParameters
+) {
+
+    @Value("\${tglog.container.name}")
+    private lateinit var containerName: String
 
     private val dockerClientConfig = DefaultDockerClientConfig.createDefaultConfigBuilder().build()
     private val dockerHttpClient = ZerodepDockerHttpClient.Builder().dockerHost(dockerClientConfig.dockerHost).build()
     private val dockerClient = DockerClientImpl.getInstance(dockerClientConfig, dockerHttpClient)
 
-    init {
-        // List all containers
+    @PostConstruct
+    fun init() {
+        logger.info { "Starting DockerService, containerName: $containerName" }
+
+         // List all containers
         val containers = dockerClient.listContainersCmd().exec()
 
         // Create an event listener
@@ -34,12 +45,11 @@ class DockerService(val messageReceiver: MessageReceiver, private val runtimeDoc
             }
         }
 
-        // Iterate through containers and get logs
+        // Iterate through containers and attach logs listener
         for (container in containers) {
             attachLogListener(container, dockerClient)
         }
         dockerClient.eventsCmd().exec(callback).awaitCompletion()
-
     }
 
 
@@ -49,8 +59,13 @@ class DockerService(val messageReceiver: MessageReceiver, private val runtimeDoc
     ) {
         val containerId = container.id
 
-        // I don't know any other way
-        if (containerId.startsWith(runtimeDockerParameters.containerId)){
+        // try this way
+        if (containerId.startsWith(runtimeDockerParameters.containerId)) {
+            logger.info { "Do not attach listener to self: ${container.readableName()}" }
+            return
+        }
+        // or this way
+        if (containerName.isNotBlank() && containerName in container.names.map { it.removePrefix("/") }) {
             logger.info { "Do not attach listener to self: ${container.readableName()}" }
             return
         }
@@ -109,6 +124,7 @@ class DockerService(val messageReceiver: MessageReceiver, private val runtimeDoc
         }
     }
 }
+
 
 private fun Container.readableName() = names.joinToString(",") { it.removePrefix("/") }
 

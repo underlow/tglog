@@ -1,3 +1,5 @@
+tglog.container.name: "tglog"
+
 tgbot:
   botToken: telegram_bot_token
   chatId: telegram_chat_id

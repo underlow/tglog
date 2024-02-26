@@ -135,6 +135,7 @@ services:
     environment:
       - TELEGRAM_BOT_TOKEN=your_bot_token
       - TELEGRAM_CHAT_ID=your_chat_id
+      - TGLOG_CONTAINER_NAME=tglog
       - <any additional env, see environment section>
       - CONTAINER_NAMES_EXCLUDE=some_container_name
       - CONTAINERS_CONTAINER_0_NAME=postgres
@@ -142,6 +143,17 @@ services:
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+```
+
+## Exclude own logs from being processed 
+
+If tglog is running in docker container it will process its own logs and it will result in almost infinite loop of messages. 
+
+To prevent this, it tries to guess own container name and exclude it from processing. 
+But sometimes it can fail, so you can specify it manually in `application.yml`:
+
+```yaml
+tglog.container.name: tglog
 ```
 
 
