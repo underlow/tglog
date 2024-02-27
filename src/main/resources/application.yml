@@ -1,4 +1,6 @@
-tglog.container.name: "tglog"
+tglog:
+  container.name: "tglog"
+  heartbeat.cron: "0 0 10 * * *" # once a day at 10:00
 
 tgbot:
   botToken: telegram_bot_token

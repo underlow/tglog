@@ -58,6 +58,9 @@ dependencies {
     implementation("com.github.docker-java:docker-java:3.3.5")
     implementation("com.github.docker-java:docker-java-transport-zerodep:3.3.5")
 
+    implementation("com.cronutils:cron-utils:9.2.0")
+
+
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
         // exclude(module = "mockito-core")

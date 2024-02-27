@@ -1,6 +1,7 @@
 package me.underlow.tglog
 
 import me.underlow.tglog.messages.MessageFilter
+import me.underlow.tglog.service.HeartBeatService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
@@ -15,6 +16,9 @@ class TgLogService {
      */
     @Autowired
     private lateinit var messageFilter: MessageFilter
+
+    @Autowired
+    private lateinit var heartbeatService: HeartBeatService
 }
 
 

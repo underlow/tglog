@@ -49,7 +49,7 @@ class DockerService(
         for (container in containers) {
             attachLogListener(container, dockerClient)
         }
-        dockerClient.eventsCmd().exec(callback).awaitCompletion()
+        dockerClient.eventsCmd().exec(callback)//.awaitCompletion()
     }
 
 

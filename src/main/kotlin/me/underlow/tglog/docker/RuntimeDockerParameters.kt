@@ -21,7 +21,6 @@ class RuntimeDockerParameters {
         val proc = Runtime.getRuntime().exec("hostname")
         val reader = BufferedReader(InputStreamReader(proc.inputStream))
         val containerName = reader.readLine()
-        println("Container Name: $containerName")
 
         if (runningInDocker && (containerName == null || containerName.isBlank())) {
             logger.error { "Running in Docker but cannot get container name, exiting..." }

@@ -43,6 +43,7 @@ class MessageFilter(
                 when (message) {
                     is LogMessage -> processLogMessage(message)
                     is ContainerMessage -> processContainerMessage(message)
+                    is HeartBeatMessage -> {} // should never really be here, heartbeat message couldn't be received from logs
                 }
             }
         }
