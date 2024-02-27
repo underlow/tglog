@@ -26,7 +26,7 @@ object TgMessage {
         val eventText = when (message.event) {
             "start" -> "started"
             "die" -> "died"
-            else -> "has event ${message.event}" // cannot find docs, let's add later
+            else -> message.event // cannot find docs, let's add later
         }
         return "Container <b>${message.containerName}</b> has event $eventText"
     }
