@@ -17,7 +17,7 @@ container:
     exclude:
   names:
     include: "*"
-    exclude:
+    exclude: "postgres"
 
 containers:
   container:

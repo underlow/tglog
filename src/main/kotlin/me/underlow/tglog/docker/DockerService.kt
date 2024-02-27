@@ -1,5 +1,6 @@
 package me.underlow.tglog.docker
 
+import ContainerNamesConfiguration
 import com.github.dockerjava.api.DockerClient
 import com.github.dockerjava.api.async.ResultCallback.Adapter
 import com.github.dockerjava.api.command.LogContainerCmd
@@ -12,6 +13,7 @@ import com.github.dockerjava.core.DockerClientImpl
 import com.github.dockerjava.zerodep.ZerodepDockerHttpClient
 import jakarta.annotation.PostConstruct
 import me.underlow.tglog.messages.ContainerMessage
+import me.underlow.tglog.messages.ContainerNameFilter
 import me.underlow.tglog.messages.LogMessage
 import me.underlow.tglog.messages.MessageReceiver
 import mu.KotlinLogging
@@ -21,8 +23,9 @@ import org.springframework.stereotype.Service
 @Service
 class DockerService(
     val messageReceiver: MessageReceiver,
-    private val runtimeDockerParameters: RuntimeDockerParameters
-) {
+    private val runtimeDockerParameters: RuntimeDockerParameters,
+    private val containerNamesConfiguration: ContainerNamesConfiguration,
+    ) {
 
     @Value("\${tglog.container.name}")
     private lateinit var containerName: String
@@ -30,6 +33,8 @@ class DockerService(
     private val dockerClientConfig = DefaultDockerClientConfig.createDefaultConfigBuilder().build()
     private val dockerHttpClient = ZerodepDockerHttpClient.Builder().dockerHost(dockerClientConfig.dockerHost).build()
     private val dockerClient = DockerClientImpl.getInstance(dockerClientConfig, dockerHttpClient)
+
+    private val containerNameFilter = ContainerNameFilter(containerNamesConfiguration)
 
     @PostConstruct
     fun init() {
@@ -61,12 +66,18 @@ class DockerService(
 
         // try this way
         if (containerId.startsWith(runtimeDockerParameters.containerId)) {
-            logger.info { "Do not attach listener to self: ${container.readableName()}" }
+            logger.info { "Will not attach listener to self: ${container.readableName()}" }
             return
         }
         // or this way
         if (containerName.isNotBlank() && containerName in container.names.map { it.removePrefix("/") }) {
-            logger.info { "Do not attach listener to self: ${container.readableName()}" }
+            logger.info { "Will not attach listener to self: ${container.readableName()}" }
+            return
+        }
+
+        // avoid attaching listener to containers from excluded list
+        if (!containerNameFilter.filter(ContainerMessage(container.readableName(), "start"))){
+            logger.info { "Will not attach listener to excluded container: ${container.readableName()}" }
             return
         }
 
