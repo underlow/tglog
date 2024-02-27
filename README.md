@@ -159,7 +159,8 @@ tglog.container.name: tglog
 ### Health check
 
 in order to check if tglog is running, it sends heart beat message to channel. Cron expression for that message can be configured in `application.yml`:
+By default it sends message every day at 10:00
 
 ```yaml
-tglog.heartbeat.cron: "0 0/5 * * * *"
+tglog.heartbeat.cron: "0 0 10 * * *"
 ```
