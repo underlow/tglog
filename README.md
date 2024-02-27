@@ -156,4 +156,10 @@ But sometimes it can fail, so you can specify it manually in `application.yml`:
 tglog.container.name: tglog
 ```
 
+### Health check
 
+in order to check if tglog is running, it sends heart beat message to channel. Cron expression for that message can be configured in `application.yml`:
+
+```yaml
+tglog.heartbeat.cron: "0 0/5 * * * *"
+```
