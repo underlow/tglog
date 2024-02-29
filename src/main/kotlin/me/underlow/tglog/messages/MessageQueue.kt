@@ -16,7 +16,7 @@ class MessageQueue(
 
     val messageChannel = Channel<Message>()
 
-    fun receiveMessage(message: Message) {
+    fun putMessage(message: Message) {
         logger.trace { "Received message $message" }
         coroutineScope.launch {
             messageChannel.send(message)

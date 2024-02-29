@@ -95,7 +95,7 @@ class DockerService(
             override fun onNext(frame: Frame) {
                 val message = LogMessage(container.readableName(), frame.payload.decodeToString().trim { it <= ' ' })
                 logger.trace { "Received log message: $message" }
-                messageQueue.receiveMessage(message)
+                messageQueue.putMessage(message)
             }
         }
 
@@ -122,12 +122,12 @@ class DockerService(
         val container = dockerClient.listContainersCmd().exec().firstOrNull { it.id == containerId }
 
         if (container == null) {
-            messageQueue.receiveMessage(ContainerMessage(containerId, event.action ?: "unknown action"))
+            messageQueue.putMessage(ContainerMessage(containerId, event.action ?: "unknown action"))
             logger.debug { "Container might be removed: $containerId" }
             return
         }
 
-        messageQueue.receiveMessage(ContainerMessage(container.readableName(), event.action ?: "unknown action"))
+        messageQueue.putMessage(ContainerMessage(container.readableName(), event.action ?: "unknown action"))
 
         if (event.action == "start") {
             logger.info { "New container created: ${container.readableName()}" }
