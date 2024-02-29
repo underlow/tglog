@@ -80,6 +80,7 @@ dependencies {
     testImplementation("net.java.dev.jna:jna:5.8.0")
     testImplementation("org.jeasy:easy-random-core:5.0.0")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
 }
 
 springBoot {

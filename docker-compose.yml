@@ -11,5 +11,7 @@ services:
       - CONTAINER_NAMES_EXCLUDE=
       - CONTAINERS_CONTAINER_0_NAME=postgres
       - CONTAINERS_CONTAINER_0_LOGS_EVENTS_EXCLUDE="database,something"
+      - CONTAINERS_CONTAINER_1_NAME=include
+      - CONTAINERS_CONTAINER_1_LOGS_EVENTS_INCLUDE="include something"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
