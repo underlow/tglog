@@ -46,13 +46,15 @@ class MessageFilter(
         }
 
         // if no filter then by global filters
-        if (containerNameFilter.filter(message))
-            return true
+        // checking inverted to prevent case when  container containerNameFilter.filter(message) returns false
+        // and we fall into next check. if filter returns false we should immediately return false
+        if (!containerNameFilter.filter(message))
+            return false
 
-        if (containerEventFilter.filter(message))
-            return true
+        if (!containerEventFilter.filter(message))
+            return false
 
-        return false
+        return true
     }
 
     fun filterLogMessage(message: LogMessage): Boolean {
@@ -63,13 +65,15 @@ class MessageFilter(
         }
 
         // if no filter then by global filters
-        if (containerNameFilter.filter(message))
-            return true
+        // checking inverted to prevent case when  container containerNameFilter.filter(message) returns false
+        // and we fall into next check. if filter returns false we should immediately return false
+        if (!containerNameFilter.filter(message))
+            return false
 
-        if (messageSubstringFilter.filter(message))
-            return true
+        if (!messageSubstringFilter.filter(message))
+            return false
 
-        return false
+        return true
     }
 }
 
