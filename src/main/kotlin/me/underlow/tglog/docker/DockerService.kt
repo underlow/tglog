@@ -15,14 +15,14 @@ import jakarta.annotation.PostConstruct
 import me.underlow.tglog.messages.ContainerMessage
 import me.underlow.tglog.messages.ContainerNameFilter
 import me.underlow.tglog.messages.LogMessage
-import me.underlow.tglog.messages.MessageReceiver
+import me.underlow.tglog.messages.MessageQueue
 import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
 @Service
 class DockerService(
-    val messageReceiver: MessageReceiver,
+    val messageQueue: MessageQueue,
     private val runtimeDockerParameters: RuntimeDockerParameters,
     private val containerNamesConfiguration: ContainerNamesConfiguration,
     ) {
@@ -95,7 +95,7 @@ class DockerService(
             override fun onNext(frame: Frame) {
                 val message = LogMessage(container.readableName(), frame.payload.decodeToString().trim { it <= ' ' })
                 logger.trace { "Received log message: $message" }
-                messageReceiver.receiveMessage(message)
+                messageQueue.receiveMessage(message)
             }
         }
 
@@ -122,12 +122,12 @@ class DockerService(
         val container = dockerClient.listContainersCmd().exec().firstOrNull { it.id == containerId }
 
         if (container == null) {
-            messageReceiver.receiveMessage(ContainerMessage(containerId, event.action ?: "unknown action"))
+            messageQueue.receiveMessage(ContainerMessage(containerId, event.action ?: "unknown action"))
             logger.debug { "Container might be removed: $containerId" }
             return
         }
 
-        messageReceiver.receiveMessage(ContainerMessage(container.readableName(), event.action ?: "unknown action"))
+        messageQueue.receiveMessage(ContainerMessage(container.readableName(), event.action ?: "unknown action"))
 
         if (event.action == "start") {
             logger.info { "New container created: ${container.readableName()}" }

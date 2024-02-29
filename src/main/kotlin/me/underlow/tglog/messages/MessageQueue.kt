@@ -9,7 +9,7 @@ import mu.KotlinLogging
 import org.springframework.stereotype.Service
 
 @Service
-class MessageReceiver(
+class MessageQueue(
     coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) {
     private val coroutineScope = CoroutineScope(coroutineDispatcher)

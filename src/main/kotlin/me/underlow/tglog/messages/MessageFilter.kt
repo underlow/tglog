@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service
     ContainersProperties::class,
 )
 class MessageFilter(
-    private val messageReceiver: MessageReceiver,
+    private val messageQueue: MessageQueue,
     private val logsEventConfiguration: LogsEventConfiguration,
     private val containerEventsConfiguration: ContainerEventsConfiguration,
     private val containerNamesConfiguration: ContainerNamesConfiguration,
@@ -42,7 +42,7 @@ class MessageFilter(
         logger.debug { "containersProperties: $containersProperties" }
 
         coroutineScope.launch {
-            for (message in messageReceiver.messageChannel) {
+            for (message in messageQueue.messageChannel) {
                 when (message) {
                     is LogMessage -> processLogMessage(message)
                     is ContainerMessage -> processContainerMessage(message)

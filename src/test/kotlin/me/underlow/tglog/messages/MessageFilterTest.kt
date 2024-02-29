@@ -7,12 +7,7 @@ import ContainerProperties
 import ContainersProperties
 import LogsEventConfiguration
 import LogsEvents
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.newSingleThreadContext
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import me.underlow.tglog.tg.TgBotService
 import me.underlow.tglog.tg.TgSender
@@ -27,7 +22,7 @@ class MessageFilterTest {
 
     @Test
     fun `processLogMessage should include message when it is in include list for concrete container independent of global settings`() = runTest {
-        val messageReceiver = MessageReceiver()
+        val messageQueue = MessageQueue()
         val logsEventConfiguration = LogsEventConfiguration()
         val containerEventsConfiguration = ContainerEventsConfiguration(include = "*")
         val containerNamesConfiguration = ContainerNamesConfiguration(include = "*")
@@ -43,7 +38,7 @@ class MessageFilterTest {
         val tgSender = TgSender(tgBotService)
 
         val messageFilter = MessageFilter(
-            messageReceiver,
+            messageQueue,
             logsEventConfiguration,
             containerEventsConfiguration,
             containerNamesConfiguration,
@@ -54,7 +49,7 @@ class MessageFilterTest {
 
         val message = LogMessage("name1", "event1")
 
-        messageReceiver.receiveMessage(message)
+        messageQueue.receiveMessage(message)
 
         // assert that message is sent to tgSender
         verify(tgBotService, times(1)).sendMessage(any())
@@ -63,7 +58,7 @@ class MessageFilterTest {
 
     @Test
     fun `processContainerMessage should include message when it is in include list for concrete container independent of global settings`() = runTest {
-        val messageReceiver = MessageReceiver()
+        val messageQueue = MessageQueue()
         val logsEventConfiguration = LogsEventConfiguration()
         val containerEventsConfiguration = ContainerEventsConfiguration(include = "*")
         val containerNamesConfiguration = ContainerNamesConfiguration(include = "*")
@@ -79,7 +74,7 @@ class MessageFilterTest {
         val tgSender = TgSender(tgBotService)
 
         val messageFilter = MessageFilter(
-            messageReceiver,
+            messageQueue,
             logsEventConfiguration,
             containerEventsConfiguration,
             containerNamesConfiguration,
@@ -90,7 +85,7 @@ class MessageFilterTest {
 
         val message = ContainerMessage("name1", "event1")
 
-        messageReceiver.receiveMessage(message)
+        messageQueue.receiveMessage(message)
 
         // assert that message is sent to tgSender
         verify(tgBotService, times(1)).sendMessage(any())
