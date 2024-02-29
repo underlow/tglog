@@ -1,19 +1,20 @@
 package me.underlow.tglog.tg
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import me.underlow.tglog.messages.Message
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
 
 @Service
 class TgSender(
-    private val tgBotService: TgBotService
+    private val tgBotService: TgBotService,
+    coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) {
+
     val messageChannel = Channel<Message>()
+
+    private val coroutineScope = CoroutineScope(coroutineDispatcher)
 
     init {
         coroutineScope.launch {
@@ -28,5 +29,4 @@ class TgSender(
     }
 }
 
-private val coroutineScope = CoroutineScope(Dispatchers.Default)
 private val logger = KotlinLogging.logger { }

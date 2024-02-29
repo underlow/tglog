@@ -5,6 +5,7 @@ import ContainerNamesConfiguration
 import ContainerProperties
 import ContainersProperties
 import LogsEventConfiguration
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -27,8 +28,10 @@ class MessageFilter(
     private val containerEventsConfiguration: ContainerEventsConfiguration,
     private val containerNamesConfiguration: ContainerNamesConfiguration,
     private val containersProperties: ContainersProperties,
-    private val tgSender: TgSender
+    private val tgSender: TgSender,
+    private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) {
+    private val coroutineScope = CoroutineScope(coroutineDispatcher)
 
     init {
         logger.debug { "Starting message filter" }
@@ -57,37 +60,57 @@ class MessageFilter(
     private val containerFilters = containersProperties.container.associate { it.name to it.toContainerFilters() }
 
     private fun processContainerMessage(message: ContainerMessage) {
-        val containerFilters = containerFilters[message.containerName]
-        if (containerFilters != null && !containerFilters.containerEvents.filter(message))
+        if (filterContainerMessage(message))
             return
 
-        if (!containerNameFilter.filter(message))
-            return
-
-        if (!containerEventFilter.filter(message))
-            return
-
-        logger.debug { "Sending message ${TgMessage.readableMessage(message)} " }
+        logger.debug { "Message ${TgMessage.readableMessage(message).take(100)} accepted by all filters" }
         coroutineScope.launch {
             tgSender.messageChannel.send(message)
         }
     }
 
-    private fun processLogMessage(message: LogMessage) {
+    private fun filterContainerMessage(message: ContainerMessage): Boolean {
+        // check if we have container specific filters
         val containerFilters = containerFilters[message.containerName]
-        if (containerFilters != null && !containerFilters.messageSubstring.filter(message))
-            return
+        if (containerFilters != null) {
+            return !containerFilters.containerEvents.filter(message)
+        }
 
+        // if no filter then by global filters
         if (!containerNameFilter.filter(message))
+            return true
+
+        if (!containerEventFilter.filter(message))
+            return true
+
+        return false
+    }
+
+    private fun processLogMessage(message: LogMessage) {
+        if (filterLogMessage(message))
             return
 
-        if (!messageSubstringFilter.filter(message))
-            return
-
-        logger.debug { "Sending message ${TgMessage.readableMessage(message)} " }
+        logger.debug { "Message ${TgMessage.readableMessage(message).take(100)} accepted by all filters" }
         coroutineScope.launch {
             tgSender.messageChannel.send(message)
         }
+    }
+
+    private fun filterLogMessage(message: LogMessage): Boolean {
+        // check if we have container specific filters
+        val containerFilters = containerFilters[message.containerName]
+        if (containerFilters != null) {
+            return !containerFilters.messageSubstring.filter(message)
+        }
+
+        // if no filter then by global filters
+        if (!containerNameFilter.filter(message))
+            return true
+
+        if (!messageSubstringFilter.filter(message))
+            return true
+
+        return false
     }
 }
 
@@ -102,7 +125,5 @@ data class ContainerFilters(
     val containerEvents: ContainerEventFilter,
     val messageSubstring: MessageSubstringFilter,
 )
-
-private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
 private val logger = KotlinLogging.logger { }

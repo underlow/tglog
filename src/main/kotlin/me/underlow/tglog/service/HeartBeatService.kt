@@ -5,6 +5,7 @@ import com.cronutils.model.CronType
 import com.cronutils.model.definition.CronDefinitionBuilder
 import com.cronutils.parser.CronParser
 import jakarta.annotation.PostConstruct
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -21,9 +22,15 @@ import org.springframework.stereotype.Service
  * scheduling can be adjusted in application.aml with `tglog.heartbeat.cron` property
  */
 @Service
-class HeartBeatService(private val tgSender: TgSender) {
+class HeartBeatService(
+    private val tgSender: TgSender,
+    coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default,
+) {
     @Value("\${tglog.heartbeat.cron}")
     private lateinit var cron: String
+
+    private val coroutineScope = CoroutineScope(coroutineDispatcher)
+
 
     @PostConstruct
     fun init() {
@@ -49,6 +56,5 @@ class HeartBeatService(private val tgSender: TgSender) {
 }
 
 
-private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
 private val logger = KotlinLogging.logger { }
