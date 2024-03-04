@@ -16,8 +16,8 @@ import mu.KotlinLogging
  */
 class MessageSubstringFilter(private val configuration: LogsEventConfiguration) {
     private val includeAll = configuration.include == "*"
-    private val include = configuration.include.split(",").filter { it.isNotBlank() }.map { it.lowercase() }.toSet()
-    private val exclude = configuration.exclude.split(",").filter { it.isNotBlank() }.map { it.lowercase() }.toSet()
+    private val include = configuration.include.split(",").filter { it.isNotBlank() }.map { it.lowercase().trim() }.toSet()
+    private val exclude = configuration.exclude.split(",").filter { it.isNotBlank() }.map { it.lowercase().trim() }.toSet()
 
     fun filter(message: LogMessage): Boolean {
         if (exclude.isNotEmpty() && exclude.any { it in message.message.lowercase() }
