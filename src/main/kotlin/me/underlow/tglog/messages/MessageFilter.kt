@@ -77,17 +77,12 @@ class MessageFilter(
     }
 
     fun humanReadableFilters(): String {
-        logger.debug { "logsEventConfiguration: $logsEventConfiguration" }
-        logger.debug { "containerEventsConfiguration: $containerEventsConfiguration" }
-        logger.debug { "containerNamesConfiguration: $containerNamesConfiguration" }
-        logger.debug { "containersProperties: $containersProperties" }
-
-        val containers = "Containers: \ninclude: ${containerNamesConfiguration.include} \nexclude: ${containerNamesConfiguration.exclude}"
-        val logs = "Logs: \ninclude: ${logsEventConfiguration.include} \nexclude: ${logsEventConfiguration.exclude}"
-        val containerEvents = "Container events: \ninclude: ${containerEventsConfiguration.include} \nexclude: ${containerEventsConfiguration.exclude}"
+        val containers = "<b>Containers:</b> \ninclude: ${containerNamesConfiguration.include} \nexclude: ${containerNamesConfiguration.exclude}"
+        val logs = "<b>Logs:</b> \ninclude: ${logsEventConfiguration.include} \nexclude: ${logsEventConfiguration.exclude}"
+        val containerEvents = "<b>Container events:</b> \ninclude: ${containerEventsConfiguration.include} \nexclude: ${containerEventsConfiguration.exclude}"
 
         val containerProperties = containersProperties.container.joinToString("\n") {
-            "Container: ${it.name} \ninclude: ${it.container.events.include} \nexclude: ${it.container.events.exclude} \nlogs: ${it.logs.events.include} \nexclude: ${it.logs.events.exclude}"
+            "<b>Container: ${it.name}</b> \ninclude: ${it.container.events.include} \nexclude: ${it.container.events.exclude} \nlogs: ${it.logs.events.include} \nexclude: ${it.logs.events.exclude}"
         }
 
         return "$containers\n$logs\n$containerEvents\n\n$containerProperties"

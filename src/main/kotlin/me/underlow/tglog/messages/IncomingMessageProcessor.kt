@@ -30,7 +30,7 @@ class IncomingMessageProcessor(
             tgSender.messageChannel.send(
                 LogMessage(
                     "tglog",
-                    "Starting message processor with filters: ${messageFilter.humanReadableFilters()}"
+                    "<b>Filters</b>: \n${messageFilter.humanReadableFilters()}"
                 )
             )
         }
