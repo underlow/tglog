@@ -25,6 +25,17 @@ class IncomingMessageProcessor(
 
     init {
         logger.debug { "Starting message processor" }
+        // after start send message containing all filtering setting
+        coroutineScope.launch {
+            tgSender.messageChannel.send(
+                LogMessage(
+                    "tglog",
+                    "Starting message processor with filters: ${messageFilter.humanReadableFilters()}"
+                )
+            )
+        }
+
+
         coroutineScope.launch {
             for (message in messageQueue.messageChannel) {
                 filterAndSend(message)
