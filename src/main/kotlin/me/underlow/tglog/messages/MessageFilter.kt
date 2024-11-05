@@ -82,7 +82,7 @@ class MessageFilter(
         val containerEvents = "<b>Container events:</b> \ninclude: ${containerEventsConfiguration.include} \nexclude: ${containerEventsConfiguration.exclude}"
 
         val containerProperties = containersProperties.container.joinToString("\n") {
-            "<b>Container: ${it.name}</b> \ninclude: ${it.container.events.include} \nexclude: ${it.container.events.exclude} \nlogs: ${it.logs.events.include} \nexclude: ${it.logs.events.exclude}"
+            "<b>Container: ${it.name}</b> \ninclude: ${it.container.events.include} \nexclude: ${it.container.events.exclude} \nlogs: \ninclude:${it.logs.events.include} \nexclude: ${it.logs.events.exclude}"
         }
 
         return "$containers\n$logs\n$containerEvents\n\n$containerProperties"

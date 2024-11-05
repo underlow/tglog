@@ -20,7 +20,7 @@
     <logger name="reactor.netty.ReactorNetty" level="INFO"/>
     <logger name="com.github.dockerjava.zerodep" level="INFO"/>
 
-    <root level="debug">
+    <root level="info">
         <appender-ref ref="STDOUT"/>
     </root>
 </configuration>
